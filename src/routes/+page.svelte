@@ -1,44 +1,55 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+    import Select, { Option } from '@smui/select';
+    import Button, { Label } from '@smui/button';
 	export let data: PageData;
-    let selectedGame: any;
-    let selectedVersion: any;
-    let selectedCountry: any;
 
-    const uniqueVersions = (data) => {
-        return Array.from(new Set(data.map((version) => version.app_ver)))
-    }
-    const uniqueCountries = (data) => {
-        return Array.from(new Set(data.map((country) => country.country)))
-    }
+	let selectedGame = 'All';
+	let selectedVersion= 'All';
+	let selectedCountry= 'All';
+
+    const sortedGames = data.games.sort((a, b) => a.name.localeCompare(b.name))
+    
+	const uniqueVersions = (data) => {
+        const versions = Array.from(new Set(data.map((version) => version.app_ver)))
+		return versions.sort()
+	};
+
+	const uniqueCountries = (data) => {
+		return Array.from(new Set(data.map((country) => country.country)));
+	};
 </script>
 
 <main>
 	<h1 class="heading">Games</h1>
-    <div class="filterBar">
-        <select bind:value={selectedGame} class="select">Filter game
-            <option value="All" selected>All</option>
-            {#each data.games as game} 
-                <option value={game.name}><img src={game.icon} alt="gameIcon">{game.name}</option>
-            {/each}
-        </select>
-        <select bind:value={selectedVersion} class="select">Filter version
-            <option value="All" selected>All</option>
-            {#each uniqueVersions(data.retention) as version} 
-                <option value={version}>{version}</option>
-            {/each}
-        </select>
-        <select bind:value={selectedCountry} class="select">Filter version
-            <option value="All" selected>All</option>
-            {#each uniqueCountries(data.retention) as country} 
-                <option value={country}>{country}</option>
-            {/each}
-        </select>
-    </div>
-    <div class="viewBar">
-        <button>Table</button>
-        <button>Chart</button>
-    </div>
+	<div class="filterBar">
+		<Select bind:value={selectedGame} class="shaped-outlined" variant="outlined" label='Filter Game'>
+			<Option value="All">All</Option>
+			{#each sortedGames as game}
+				<Option value={game.name}><img src={game.icon} alt="gameIcon" width="32" height="32"/>{game.name}</Option>
+			{/each}
+		</Select>
+		<Select bind:value={selectedVersion} class="shaped-outlined" variant="outlined" label='Filter Version'>
+			<Option value="All">All</Option>
+			{#each uniqueVersions(data.retention) as version}
+				<Option value={version}>{version}</Option>
+			{/each}
+		</Select>
+		<Select bind:value={selectedCountry} class="shaped-outlined" variant="outlined" label='Filter Country'>
+			<Option value="All">All</Option>
+			{#each uniqueCountries(data.retention) as country}
+				<Option value={country}>{country}</Option>
+			{/each}
+		</Select>
+	</div>
+	<div class="viewBar">
+		<Button variant="raised">
+          <Label>Table</Label>
+        </Button>
+		<Button variant="raised">
+            <Label>Chart</Label>
+        </Button>
+	</div>
 	{#if data.games.length > 0}
 		<table>
 			<thead>
@@ -64,17 +75,13 @@
 </main>
 
 <style>
-    .heading{
-        text-align: center;
-    }
+	.heading {
+		text-align: center;
+	}
 
-    .filterBar{
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-    }
-
-    .select{
-     
-    }
+	.filterBar {
+		display: flex;
+		gap: 10px;
+		justify-content: center;
+	}
 </style>
